@@ -238,6 +238,11 @@ console.log(Math.round(average(
 console.log("Strings and character codes\n");
 
 //Strings and character codes
+/**
+ * функция для определения того, какой именно скрипт используется в тексте.
+ * метод some - еще одна функция высшего порядка. Она принимает функцию test 
+ * и говорит вовзращает ли функция true для любого элемента в массиве
+ */
 function characterScript(code: number) {
     for (let script of SCRIPTS) {
         if (script.ranges.some(([from, to]: number[]) => {
