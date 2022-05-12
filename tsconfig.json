@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "target": "es2016",
+    "lib": [
+      "DOM",
+      "es2016",
+      "DOM.Iterable",
+      "ScriptHost"
+    ],
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "allowJs": true,
+    "moduleResolution": "node"
+  }
+}
