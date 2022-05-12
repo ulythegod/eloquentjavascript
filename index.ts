@@ -158,6 +158,63 @@ const SCRIPTS: Script[] = [
         year: 1974,
         living: true,
         link: "https://en.wikipedia.org/wiki/SignWriting"
+    },
+    {
+        name: "Latin",
+        ranges: [
+            [65, 91],
+            [97, 123],
+            [170, 171],
+            [186, 187],
+            [192, 215],
+            [216, 247],
+            [248, 697],
+            [736, 741],
+            [7424, 7462],
+            [7468, 7517],
+            [7522, 7526],
+            [7531, 7544],
+            [7545, 7615],
+            [7680, 7936],
+            [8305, 8306],
+            [8319, 8320],
+            [8336, 8349],
+            [8490, 8492],
+            [8498, 8499],
+            [8526, 8527],
+            [8544, 8585],
+            [11360, 11392],
+            [42786, 42888],
+            [42891, 42927],
+            [42928, 42936],
+            [42999, 43008],
+            [43824, 43867],
+            [43868, 43877],
+            [64256, 64263],
+            [65313, 65339],
+            [65345, 65371]
+        ],
+        direction: "ltr",
+        year: -700,
+        living: true,
+        link: "https://en.wikipedia.org/wiki/Latin_script"
+    }, 
+    {
+        name:	"Cyrillic",
+        ranges:	[
+            [1024, 1157],
+            [1159, 1328],
+            [7296, 7305],
+            [7467, 7468],
+            [7544, 7545],
+            [11744, 11776],
+            [42560, 42656],
+            [65070, 65072]
+        ],
+        direction:	"ltr",
+        year:	950,
+        living:	true,
+        link:	"https://en.wikipedia.org/wiki/Cyrillic_script"
     }
 ];
 
@@ -256,3 +313,120 @@ function characterScript(code: number) {
 }
 
 console.log(characterScript(6161));
+
+console.log("Recognizing text\n");
+
+/**
+ * функция ожидает коллекцию (все, по чему пожно пройтись в цилом for/of) 
+ * и функцию которая подсчитывает груповое имя данного элемента
+ */
+//Recognizing text
+function countBy(items: any[], groupName: Function) {
+    let counts: any[] = [];
+
+    for (let item of items) {
+        let name = groupName(item);
+        let known = counts.findIndex(c => c.name === name);
+        if (known === -1) {
+            counts.push({name, count: 1});
+        } else {
+            counts[known].count++;
+        }
+    }
+
+    return counts;
+}
+
+console.log(countBy([1, 2, 3, 4, 5], n => n > 2));
+
+/**
+ * функция считывает символы по их имени используя characterScript
+ * чтобы определить к какому алфавиту они относятся. Фильтр 
+ * отбрасывает все "none" из полученного массива после этого.
+ * Чтобы подсчитать проценты, нам сначала нужно общее количество 
+ * символов, которые принадлежат алфавиту, это можно сделать функцией reduce.
+ * Если нет таких символов, функция вернет специальную строку.
+ * Затем, она трансформирует подсчитанные данные в читаемую строку 
+ * с помощью map и соединит их с join.
+ */
+function textScripts(text: any) {
+    let scripts = countBy(text, char => {        
+        let script = characterScript(char.codePointAt(0));
+        return script ? script.name : "none";
+    }).filter(({name}) => name !== "none");
+
+    let total = scripts.reduce((n, {count}) => n + count, 0);
+    if (total === 0) return "No scripts found";
+
+    return scripts.map(({name, count}) => {
+        return `${Math.round(count * 100 / total)} % ${name}`;
+    }).join(", ");
+}
+
+console.log(textScripts('英国的狗说"woof", 俄罗斯的狗说"тяв"'));
+
+//Exercises
+//Flattening
+console.log("Flattering \n");
+
+let arrays = [[1, 2, 3], [4, 5], [6]];
+let flattenArray: number[] = [];
+
+for (let element of arrays) {    
+    flattenArray = flattenArray.concat(element);
+}
+
+console.log(flattenArray);
+
+console.log("Your own loop \n");
+//Your own loop
+function loop(num: number, test: Function, update: Function, body: Function) {
+    while (test(num)) {
+        body(num);
+        num = update(num);
+    }
+}
+
+loop(3, n => n > 0, n => n - 1, console.log);
+
+console.log("Everything \n");
+//Your own loop
+function every(array: number[], test: Function) {
+    for (let element of array) {
+        if (!test(element)) {
+            return false
+        }
+    }
+
+    return true;
+}
+
+console.log(every([1, 3, 5], n => n < 10));
+console.log(every([2, 4, 16], n => n < 10));
+console.log(every([], n => n < 10));
+
+function everySome(array: number[], test: Function) {
+    return array.some(element => !test(element));
+}
+
+console.log(everySome([1, 3, 5], n => n < 10));
+console.log(everySome([2, 4, 16], n => n < 10));
+console.log(everySome([], n => n < 10));
+
+console.log("Dominant writing direction \n");
+//Dominant writing direction
+function dominantDirection(text: any) {
+    let scripts = countBy(text, char => {        
+        let script = characterScript(char.codePointAt(0));
+        return script ? script.name : "none";
+    }).filter(({name}) => name !== "none");
+
+    if (scripts.length === 0) {
+        return "ltr";
+    }
+
+    return scripts.reduce((a, b) => a.count > b.count ?  a : b);
+}
+
+console.log(dominantDirection("Hello!"));
+console.log(dominantDirection("Hey, այբըթթօծա"));
