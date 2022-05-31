@@ -401,17 +401,17 @@ function every(array: number[], test: Function) {
     return true;
 }
 
-console.log(every([1, 3, 5], n => n < 10));
-console.log(every([2, 4, 16], n => n < 10));
-console.log(every([], n => n < 10));
+// console.log(every([1, 3, 5], n => n < 10));
+// console.log(every([2, 4, 16], n => n < 10));
+// console.log(every([], n => n < 10));
 
 function everySome(array: number[], test: Function) {
     return array.some(element => !test(element));
 }
 
-console.log(everySome([1, 3, 5], n => n < 10));
-console.log(everySome([2, 4, 16], n => n < 10));
-console.log(everySome([], n => n < 10));
+// console.log(everySome([1, 3, 5], n => n < 10));
+// console.log(everySome([2, 4, 16], n => n < 10));
+// console.log(everySome([], n => n < 10));
 
 console.log("Dominant writing direction \n");
 //Dominant writing direction
@@ -428,5 +428,76 @@ function dominantDirection(text: any) {
     return scripts.reduce((a, b) => a.count > b.count ?  a : b);
 }
 
-console.log(dominantDirection("Hello!"));
-console.log(dominantDirection("Hey, այբըթթօծա"));
+// console.log(dominantDirection("Hello!"));
+// console.log(dominantDirection("Hey, այբըթթօծա"));
+
+//Project: A Robot
+console.log("Project: A Robot \n");
+
+const roads: string[] = [
+    "Alice's House-Bob's House",   "Alice's House-Cabin",
+    "Alice's House-Post Office",   "Bob's House-Town Hall",
+    "Daria's House-Ernie's House", "Daria's House-Town Hall",
+    "Ernie's House-Grete's House", "Grete's House-Farm",
+    "Grete's House-Shop",          "Marketplace-Farm",
+    "Marketplace-Post Office",     "Marketplace-Shop",
+    "Marketplace-Town Hall",       "Shop-Town Hall"
+];
+
+function buildGraph(edges: string[]) {
+    let graph = Object.create(null);
+
+    function addEdge(from: string, to: string) {
+        if (graph[from] == null) {
+            graph[from] = [to];
+        } else {
+            graph[from].push(to);
+        }
+    }
+
+    for (let [from, to] of edges.map(r => r.split("-"))) {
+        addEdge(from, to);
+        addEdge(to, from);
+    }
+
+    return graph;
+}
+
+const roadGraph = buildGraph(roads);
+
+class VillageState {
+    place: string;
+    parsels: any[];
+
+    constructor (place: string, parsels: any) {
+        this.place = place;
+        this.parsels = parsels;
+    }
+
+    move(destination: string) {
+        console.log("roadGraph", roadGraph);
+        console.log("this.place", this.place);
+        console.log("this.parsels", this.parsels);
+        
+        if (!roadGraph[this.place].includes(destination)) {
+            return this;
+        } else {
+            let parcels = this.parsels.map((p: { place: string; address: any; }) => {
+                if (p.place != this.place) return p;
+            }).filter((p: { place: string; address: any; }) => p.place != p.address);
+
+            return new VillageState(destination, parcels);
+        }
+    }
+}
+
+let first = new VillageState(
+    "Post Office",
+    [{place: "Post Office", address: "Alice's House"}]
+);
+
+let next = first.move("Alice's House");
+
+console.log(next.place);
+console.log(next.parsels);
+console.log(first.place);

@@ -362,15 +362,15 @@ function every(array, test) {
     }
     return true;
 }
-console.log(every([1, 3, 5], function (n) { return n < 10; }));
-console.log(every([2, 4, 16], function (n) { return n < 10; }));
-console.log(every([], function (n) { return n < 10; }));
+// console.log(every([1, 3, 5], n => n < 10));
+// console.log(every([2, 4, 16], n => n < 10));
+// console.log(every([], n => n < 10));
 function everySome(array, test) {
     return array.some(function (element) { return !test(element); });
 }
-console.log(everySome([1, 3, 5], function (n) { return n < 10; }));
-console.log(everySome([2, 4, 16], function (n) { return n < 10; }));
-console.log(everySome([], function (n) { return n < 10; }));
+// console.log(everySome([1, 3, 5], n => n < 10));
+// console.log(everySome([2, 4, 16], n => n < 10));
+// console.log(everySome([], n => n < 10));
 console.log("Dominant writing direction \n");
 //Dominant writing direction
 function dominantDirection(text) {
@@ -386,5 +386,62 @@ function dominantDirection(text) {
     }
     return scripts.reduce(function (a, b) { return a.count > b.count ? a : b; });
 }
-console.log(dominantDirection("Hello!"));
-console.log(dominantDirection("Hey, այբըթթօծա"));
+// console.log(dominantDirection("Hello!"));
+// console.log(dominantDirection("Hey, այբըթթօծա"));
+//Project: A Robot
+console.log("Project: A Robot \n");
+var roads = [
+    "Alice's House-Bob's House", "Alice's House-Cabin",
+    "Alice's House-Post Office", "Bob's House-Town Hall",
+    "Daria's House-Ernie's House", "Daria's House-Town Hall",
+    "Ernie's House-Grete's House", "Grete's House-Farm",
+    "Grete's House-Shop", "Marketplace-Farm",
+    "Marketplace-Post Office", "Marketplace-Shop",
+    "Marketplace-Town Hall", "Shop-Town Hall"
+];
+function buildGraph(edges) {
+    var graph = Object.create(null);
+    function addEdge(from, to) {
+        if (graph[from] == null) {
+            graph[from] = [to];
+        }
+        else {
+            graph[from].push(to);
+        }
+    }
+    for (var _i = 0, _a = edges.map(function (r) { return r.split("-"); }); _i < _a.length; _i++) {
+        var _b = _a[_i], from = _b[0], to = _b[1];
+        addEdge(from, to);
+        addEdge(to, from);
+    }
+    return graph;
+}
+var roadGraph = buildGraph(roads);
+var VillageState = /** @class */ (function () {
+    function VillageState(place, parsels) {
+        this.place = place;
+        this.parsels = parsels;
+    }
+    VillageState.prototype.move = function (destination) {
+        var _this = this;
+        console.log("roadGraph", roadGraph);
+        console.log("this.place", this.place);
+        console.log("this.parsels", this.parsels);
+        if (!roadGraph[this.place].includes(destination)) {
+            return this;
+        }
+        else {
+            var parcels = this.parsels.map(function (p) {
+                if (p.place != _this.place)
+                    return p;
+            }).filter(function (p) { return p.place != p.address; });
+            return new VillageState(destination, parcels);
+        }
+    };
+    return VillageState;
+}());
+var first = new VillageState("Post Office", [{ place: "Post Office", address: "Alice's House" }]);
+var next = first.move("Alice's House");
+console.log(next.place);
+console.log(next.parsels);
+console.log(first.place);
