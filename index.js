@@ -424,17 +424,16 @@ var VillageState = /** @class */ (function () {
     }
     VillageState.prototype.move = function (destination) {
         var _this = this;
-        console.log("roadGraph", roadGraph);
-        console.log("this.place", this.place);
-        console.log("this.parsels", this.parsels);
         if (!roadGraph[this.place].includes(destination)) {
             return this;
         }
         else {
-            var parcels = this.parsels.map(function (p) {
-                if (p.place != _this.place)
+            var parcelsMap = this.parsels.map(function (p) {
+                if (p.place !== _this.place)
                     return p;
-            }).filter(function (p) { return p.place != p.address; });
+                return { place: destination, address: p.address };
+            });
+            var parcels = parcelsMap.filter(function (p) { return p.place !== p.address; });
             return new VillageState(destination, parcels);
         }
     };
@@ -445,3 +444,36 @@ var next = first.move("Alice's House");
 console.log(next.place);
 console.log(next.parsels);
 console.log(first.place);
+function runRobot(state, robot, memory) {
+    for (var turn = 0;; turn++) {
+        if (state.parcels.length === 0) {
+            console.log("Done in ".concat(turn, " turns"));
+            break;
+        }
+        var action = robot(state, memory);
+        state = state.move(action.direction);
+        memory = action.memory;
+        console.log("Moved to ".concat(action.direction));
+    }
+}
+function randomPick(array) {
+    var choice = Math.floor(Math.random() * array.length);
+    return array[choice];
+}
+function randomRobot(state) {
+    return { direction: randomPick(roadGraph[state.place]) };
+}
+VillageState.random = function (parcelCount) {
+    if (parcelCount === void 0) { parcelCount = 5; }
+    var parcels = [];
+    for (var i = 0; i < parcelCount; i++) {
+        var address = randomPick(Object.keys(roadGraph));
+        var place = void 0;
+        do {
+            place = randomPick(Object.keys(roadGraph));
+        } while (place === address);
+        parcels.push({ place: place, address: address });
+    }
+    return new VillageState("Post Office", parcels);
+};
+runRobot(VillageState.random(), randomRobot);
